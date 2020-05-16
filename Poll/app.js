@@ -274,8 +274,9 @@ const schema = new GraphQLSchema({
                    party: { type: GraphQLNonNull(GraphQLString) },
                  },
                  resolve: (root, args, context, info) => {
-                     var candidate = CandidateModel.find({"name":args['name'],"place":args['place'], "party":args['party']});
-                     CandidateModel.deleteMany({ "name":args['name'],"place":args['place'], "party":args['party']});
+                     var candidate = CandidateModel.findOne({"name":args['name'],"place":args['place'], "party":args['party']},function(err,doc){
+                        CandidateModel.deleteMany({ "name":args['name'],"place":args['place'], "party":args['party']}).exec();
+                     }).exec();
                      return candidate;
                  }
              },
@@ -319,8 +320,9 @@ const schema = new GraphQLSchema({
                     party_prefered: { type: GraphQLNonNull(GraphQLString) },
                   },
                   resolve: (root, args, context, info) => {
-                      var voter =VoterModel.find({ "name":args['name'],"place":args['place'], "party_prefered":args['party_prefered']},);
+                      var voter =VoterModel.findOne({ "name":args['name'],"place":args['place'], "party_prefered":args['party_prefered']},function(err,doc){
                       VoterModel.deleteMany({ "name":args['name'],"place":args['place'], "party_prefered":args['party_prefered']},);
+                      }).exec();
                       return voter;
                   }
               },
@@ -368,8 +370,9 @@ const schema = new GraphQLSchema({
                      winner: { type: GraphQLNonNull(GraphQLString) },
                    },
                    resolve: (root, args, context, info) => {
-                       var area = AreaModel.find({ "name":args['name'],"opposition":args['opposition'], "winner":args['winner']});
-                       AreaModel.deleteMany({ "name":args['name'],"opposition":args['opposition'], "winner":args['winner']},);
+                       var area = AreaModel.find({ "name":args['name'],"opposition":args['opposition'], "winner":args['winner']},function(err,doc){
+                         AreaModel.deleteMany({ "name":args['name'],"opposition":args['opposition'], "winner":args['winner']},).exe();
+                       }).exec();
                        return area;
                    }
                },
@@ -384,6 +387,6 @@ app.use("/graphql", ExpressGraphQL({
    graphiql: true
 }));
 
-app.listen(3000, () => {
+app.listen(3001, () => {
    console.log("Listening at :3000...");
 });
