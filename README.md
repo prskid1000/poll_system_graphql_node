@@ -1,2 +1,16 @@
 # poll_system_graphql_node
-NodeJS API of poll system
+NodeJS API version of Poll system
+
+## Example queries
+
+mutation Mutation{
+    delete_candidate(name:"Prithwiraj",place:"xonari",party:"TMC") {
+        name
+    }
+}
+
+mutation Mutation{
+    create_candidate(name:"Prithwiraj",place:"xonari",party:"TMC",votes:"0",age:"19") {
+        name
+    }
+}
