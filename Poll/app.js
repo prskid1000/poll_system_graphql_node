@@ -377,6 +377,66 @@ const schema = new GraphQLSchema({
                    }
                },
 
+               cast_vote: {
+                 type: VoterType,
+                 args: {
+                     name: { type: GraphQLNonNull(GraphQLString) }
+                 },
+                 resolve: (root, args, context, info) => {
+                   var voter = VoterModel.findOne({ "name":args['name']},function(err,voter){
+
+                     var candidate = CandidateModel.find({ "party":voter['party_prefered']},function(err,candidate){
+
+                       for(var i=0;i<candidate.length;i++)
+                       {
+                         if(candidate[i]['votes']=="NaN")candidate[i]['votes']="0";
+                         var num=parseInt(candidate[i]['votes'])+1;
+                         candidate[i]['votes']=num.toString();
+                         candidate[i].save();
+                       }
+                     }).exec();
+
+                      return voter;
+                   }).exec();
+                 }
+               },
+
+               areas_vote_prediction: {
+                 type: AreaType,
+                 args: {
+                     name: { type: GraphQLNonNull(GraphQLString) }
+                 },
+                 resolve: (root, args, context, info) => {
+                   var area = AreaModel.findOne({ "name":args['name']},function(err,area){
+
+                     var candidate = CandidateModel.find({ "place":args['name']},function(err,candidate){
+
+                       area['winning_party']=candidate[candidate.length-1]['party'];
+                       area['opposition_party']="None";
+                       area['winner']=candidate[candidate.length-1]['name'];
+                       area['opposition']="None";
+                       mxvotes=-1;
+
+                      for(var i=0;i<candidate.length;i++)
+                      {
+                        if(parseInt(candidate[i]['votes'])>mxvotes && parseInt(candidate[i]['age'])>=18)
+                        {
+                          area['opposition_party']=area['winning_party'];
+                          area['winning_party']=candidate[i]['party'];
+                          area['opposition']=area['winner'];
+                          area['winner']=candidate[i]['name'];
+                          mxvotes=parseInt(candidate[i]['votes']);
+                        }
+                      }
+                       area.save();
+                     }).exec();
+
+                     return area;
+                   }).exec();
+                 }
+               }
+
+
         }
     }),
 });
@@ -388,5 +448,5 @@ app.use("/graphql", ExpressGraphQL({
 }));
 
 app.listen(3001, () => {
-   console.log("Listening at :3000...");
+   console.log("Listening at :3001...");
 });
