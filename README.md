@@ -1,4 +1,4 @@
-# poll_system_graphql_node
+# POLL-API-N
 NodeJS API version of Poll system
 
 ## Example queries
